@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), MainView {
         chat_view.setMenuClickListener(object : OnMenuItemClickListener {
             override fun switchToEmojiMode() {
                 if (airPanelLayout.isOpen) {
-                    Util.hideKeyboard(chat_view.chatInputView.getmChatInput())
+                    Util.showKeyboard(chat_view.chatInputView.getmChatInput())
                 } else {
                     airPanelLayout.openPanel()
                 }
