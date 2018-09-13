@@ -1,4 +1,4 @@
-package com.letion.test
+package com.letion.test.bean
 
 import com.letion.green_dao.model.IUser
 

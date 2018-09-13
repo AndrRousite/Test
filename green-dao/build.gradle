@@ -39,5 +39,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     implementation 'org.greenrobot:greendao:3.2.2'
-    implementation 'com.blankj:utilcode:1.16.4'
+    api 'com.blankj:utilcode:1.16.4'
 }

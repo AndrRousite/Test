@@ -1,4 +1,4 @@
-package com.letion.test
+package com.letion.test.chat
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -10,20 +10,24 @@ import com.letion.green_dao.inputs.OnMenuItemClickListener
 import com.letion.green_dao.inputs.airpanel.Util
 import com.letion.green_dao.messages.MsgListAdapter
 import com.letion.green_dao.util.ImageLoader
-import kotlinx.android.synthetic.main.activity_main.*
+import com.letion.test.R
+import com.letion.test.bean.TestMessage
+import kotlinx.android.synthetic.main.activity_chat.*
 import java.util.*
 
-class MainActivity : AppCompatActivity(), MainView {
-    var mainPresenter: MainPresenter? = null
+class ChatActivity : AppCompatActivity(), ChatView {
+
+    var pageIndex: Int = 0
+    var chatPresenter: ChatPresenter? = null
     private var list: MutableList<TestMessage>? = null
     private var msgListAdapter: MsgListAdapter<TestMessage>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        mainPresenter = MainPresenter()
-        mainPresenter?.mainView = this
-        mainPresenter?.onCreate()
+        setContentView(R.layout.activity_chat)
+        chatPresenter = ChatPresenter()
+        chatPresenter?.view = this
+        chatPresenter?.onCreate()
 
         airPanelLayout.setup {
             Util.hideKeyboard(chat_view.chatInputView.getmChatInput())
@@ -42,7 +46,7 @@ class MainActivity : AppCompatActivity(), MainView {
 
                     avatarImageView.setImageResource(resId)
                 } else {
-                    Glide.with(this@MainActivity)
+                    Glide.with(this@ChatActivity)
                             .load(string)
                             .apply(RequestOptions().placeholder(R.drawable.aurora_headicon_default))
                             .into(avatarImageView)
@@ -59,7 +63,8 @@ class MainActivity : AppCompatActivity(), MainView {
         chat_view.msgList.setAdapter(msgListAdapter)
 
         chat_view.ptrLayout?.setPtrHandler {
-            mainPresenter?.loadNextPage()
+            pageIndex++
+            chatPresenter?.loadNextPage(pageIndex)
         }
 
         chat_view.setMenuClickListener(object : OnMenuItemClickListener {
@@ -72,7 +77,7 @@ class MainActivity : AppCompatActivity(), MainView {
             }
 
             override fun onSendTextMessage(input: CharSequence?): Boolean {
-                return mainPresenter!!.sendMessage(input)
+                return chatPresenter!!.sendMessage(input)
             }
         })
 
@@ -87,7 +92,9 @@ class MainActivity : AppCompatActivity(), MainView {
             false
         }
 
+        chatPresenter?.loadNextPage(pageIndex)
     }
+
 
     override fun onBackPressed() {
         if (airPanelLayout.isOpen) {
@@ -99,14 +106,22 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainPresenter?.onDestory()
+        chatPresenter?.onDestroy()
     }
 
-    override fun notifyData(content: TestMessage) {
+    override fun notifyTitle(title: String) {
+        setTitle(title)
+    }
+
+    override fun notifyData(msgId: String?, content: TestMessage) {
         runOnUiThread {
-            list!!.add(0, content)
-            msgListAdapter?.addToStart(content, true)
+            msgListAdapter?.updateOrAddMessage(msgId ?: "", content, true)
         }
     }
 
+    override fun notifyData(content: List<TestMessage>) {
+        runOnUiThread({
+            msgListAdapter?.addToEnd(content)
+        })
+    }
 }

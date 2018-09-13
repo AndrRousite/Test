@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".chat.ChatActivity">
+
+    <com.letion.green_dao.inputs.airpanel.AirPanelLinearLayout
+        android:id="@+id/airPanelLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.letion.test.base.ChatView
+            android:id="@+id/chat_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.letion.green_dao.messages.ptr.PullToRefreshLayout
+                android:id="@+id/pull_to_refresh_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/chat_input"
+                app:PtrCloseDuration="300"
+                app:PtrCloseHeaderDuration="2000"
+                app:PtrKeepHeaderWhenRefresh="true"
+                app:PtrPullToRefresh="true"
+                app:PtrRatioHeightToRefresh="1.2"
+                app:PtrResistance="1.2">
+
+                <com.letion.green_dao.messages.MessageList
+                    android:id="@+id/msg_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:avatarHeight="48dp"
+                    app:avatarRadius="5dp"
+                    app:avatarWidth="48dp"
+                    app:bubbleMaxWidth="0.70"
+                    app:dateTextSize="12sp"
+                    app:receiveBubblePaddingLeft="16dp"
+                    app:receiveBubblePaddingRight="8dp"
+                    app:receiveTextColor="#ffffff"
+                    app:receiveTextSize="16sp"
+                    app:sendBubblePaddingLeft="8dp"
+                    app:sendBubblePaddingRight="16dp"
+                    app:sendTextColor="#7587A8"
+                    app:sendTextSize="16sp"
+                    app:showReceiverDisplayName="false"
+                    app:showSenderDisplayName="false" />
+
+
+            </com.letion.green_dao.messages.ptr.PullToRefreshLayout>
+
+            <com.letion.green_dao.inputs.ChatInputView
+                android:id="@+id/chat_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true" />
+
+
+        </com.letion.test.base.ChatView>
+
+
+    </com.letion.green_dao.inputs.airpanel.AirPanelLinearLayout>
+</android.support.constraint.ConstraintLayout>

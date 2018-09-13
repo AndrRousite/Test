@@ -14,7 +14,7 @@ public class EventViewHolder<MESSAGE extends IMessage>
 
     public EventViewHolder(View itemView, boolean isSender) {
         super(itemView);
-        mEvent = (RoundTextView) itemView.findViewById(R.id.aurora_tv_msgitem_event);
+        mEvent = itemView.findViewById(R.id.aurora_tv_msgitem_event);
     }
 
     @Override

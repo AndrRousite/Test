@@ -1,4 +1,4 @@
-package com.letion.test
+package com.letion.test.base
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,6 +8,7 @@ import com.letion.green_dao.inputs.ChatInputView
 import com.letion.green_dao.inputs.OnMenuItemClickListener
 import com.letion.green_dao.messages.MessageList
 import com.letion.green_dao.messages.ptr.PullToRefreshLayout
+import com.letion.test.R
 
 /**
  * <p>

@@ -4,63 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".main.MainActivity">
 
-    <com.letion.green_dao.inputs.airpanel.AirPanelLinearLayout
-        android:id="@+id/airPanelLayout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.letion.test.ChatView
-            android:id="@+id/chat_view"
+        <TextView
+            android:id="@+id/tvStatus"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.letion.green_dao.messages.ptr.PullToRefreshLayout
-                android:id="@+id/pull_to_refresh_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@+id/chat_input"
-                app:PtrCloseDuration="300"
-                app:PtrCloseHeaderDuration="2000"
-                app:PtrKeepHeaderWhenRefresh="true"
-                app:PtrPullToRefresh="true"
-                app:PtrRatioHeightToRefresh="1.2"
-                app:PtrResistance="1.2">
-
-                <com.letion.green_dao.messages.MessageList
-                    android:id="@+id/msg_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:avatarHeight="48dp"
-                    app:avatarRadius="5dp"
-                    app:avatarWidth="48dp"
-                    app:bubbleMaxWidth="0.70"
-                    app:dateTextSize="14sp"
-                    app:receiveBubblePaddingLeft="16dp"
-                    app:receiveBubblePaddingRight="8dp"
-                    app:receiveTextColor="#ffffff"
-                    app:receiveTextSize="16sp"
-                    app:sendBubblePaddingLeft="8dp"
-                    app:sendBubblePaddingRight="16dp"
-                    app:sendTextColor="#7587A8"
-                    app:sendTextSize="16sp"
-                    app:showReceiverDisplayName="true"
-                    app:showSenderDisplayName="false" />
+            android:layout_height="40dp"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:singleLine="true"
+            android:textColor="#666666"
+            android:visibility="gone"
+            tools:background="#66999999"
+            tools:text="连接错误"
+            tools:visibility="visible" />
 
 
-            </com.letion.green_dao.messages.ptr.PullToRefreshLayout>
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-            <com.letion.green_dao.inputs.ChatInputView
-                android:id="@+id/chat_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true" />
+    </LinearLayout>
 
-
-        </com.letion.test.ChatView>
-
-
-    </com.letion.green_dao.inputs.airpanel.AirPanelLinearLayout>
 </android.support.constraint.ConstraintLayout>
