@@ -13,6 +13,7 @@ import com.letion.test.bean.TestMessage
 interface ChatView : IView {
     fun notifyTitle(title: String)
 
-    fun notifyData(msgId: String?,content: TestMessage)
-    fun notifyData(content: List<TestMessage>)
+    fun notifyData(msgId: String?, content: TestMessage)
+    fun scrollToPosition(position: Int)
+    fun notifyData(content: List<TestMessage>?)
 }

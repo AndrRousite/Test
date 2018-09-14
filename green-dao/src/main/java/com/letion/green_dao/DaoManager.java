@@ -54,6 +54,7 @@ public class DaoManager {
     public long addOrUpdateConversation(String userId, String userName, String userAvatar, String
             userPhone) {
         Conversation conversation = new Conversation();
+        conversation.setId(Long.valueOf(RandomUtil.number11()));
         conversation.setUserId(userId);
         conversation.setName(userName);
         conversation.setAvatar(userAvatar);
@@ -74,7 +75,7 @@ public class DaoManager {
 
     public List<Message> searchMessage(long sessionId, int page, int pageSize) {
         return getDaoSession().getMessageDao().queryBuilder().where(MessageDao.Properties
-                .SessionId.eq(sessionId)).offset
+                .SessionId.eq(sessionId)).orderDesc(MessageDao.Properties.MsgTime).offset
                 (page * pageSize).limit(pageSize).list();
     }
 

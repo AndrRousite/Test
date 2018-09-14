@@ -2,6 +2,7 @@ package com.letion.test.base
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.support.v4.widget.SwipeRefreshLayout
 import android.util.AttributeSet
 import android.widget.RelativeLayout
 import com.letion.green_dao.inputs.ChatInputView
@@ -20,7 +21,7 @@ import com.letion.test.R
 class ChatView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : RelativeLayout
 (context, attrs, defStyleAttr) {
     lateinit var msgList: MessageList
-    var ptrLayout: PullToRefreshLayout? = null
+    var ptrLayout: SwipeRefreshLayout? = null
         get() = field
 
     lateinit var chatInputView: ChatInputView
@@ -49,5 +50,10 @@ class ChatView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : Rel
 
     fun setMenuClickListener(listener: OnMenuItemClickListener) {
         chatInputView.setMenuClickListener(listener)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun setOnTouchListener(l: OnTouchListener?) {
+        msgList.setOnTouchListener(l)
     }
 }

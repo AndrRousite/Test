@@ -31,8 +31,10 @@ import java.util.*
  * @date 2018/9/13 0013
  */
 class ChatPresenter : BasePresenter<ChatView>() {
+    var pageIndex: Int = 0
+    var noMore: Boolean = false
     private var listener: ISocketActionListener? = null
-    private val sessionId = 1L
+    var sessionId = 64214439902
     private val from = "0"
     private val to = "1"
 
@@ -57,13 +59,9 @@ class ChatPresenter : BasePresenter<ChatView>() {
 
             override fun onSocketReadResponse(context: Context?, info: ConnectionInfo?, action: String?, data: OriginalData?) {
                 super.onSocketReadResponse(context, info, action, data)
-                receiverMessage(data = AES.decode(data?.bodyBytes.toString()))
+                receiverMessage(data = AES.decrypt(data?.bodyBytes?.toString(Charset.defaultCharset())))
             }
 
-            override fun onSocketWriteResponse(context: Context?, info: ConnectionInfo?, action: String?, data: ISendable?) {
-                super.onSocketWriteResponse(context, info, action, data)
-                //receiverMessage(data = AES.decode(data.toString()))
-            }
         }
         SocketManager.addISocketActionListener(listener as SocketActionAdapter)
     }
@@ -79,7 +77,7 @@ class ChatPresenter : BasePresenter<ChatView>() {
         val message = TestMessage(s.toString(), IMessage.MessageType.SEND_TEXT.ordinal)
         message.id = RandomUtil.number18().toLong()
         message.user = TestUser("1", "Ironman", "R.drawable.ironman")
-        message.time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        message.time = com.letion.test.util.Date.getTimestampString(Date())
 
         ThreadUtil.execute({
 
@@ -100,15 +98,24 @@ class ChatPresenter : BasePresenter<ChatView>() {
         return true
     }
 
-    fun loadNextPage(page: Int) {
+    fun loadNextPage() {
+        if (noMore) {
+            view?.notifyData(null)
+            return
+        }
         ThreadUtil.execute {
-            val messages = DaoManager.getInstance().searchMessage(sessionId, page, 10)
+            val messages = DaoManager.getInstance().searchMessage(sessionId, pageIndex, 10)
+
+            this.noMore = null == messages || messages.isEmpty()
 
             val conversation = DaoManager.getInstance().searchConversationById(sessionId)
 
             val list: MutableList<TestMessage> = ArrayList()
 
-            messages.forEach({
+            for (i in messages.indices) {
+                val it = messages[i]
+
+                val lastIt = if (i - 1 > 0 && i - 1 < messages.size) messages[i - 1] else null
 
                 if (it.msgType == 0) {
                     val message = TestMessage(it.content, if (it.from.equals(from)) IMessage.MessageType
@@ -121,13 +128,19 @@ class ChatPresenter : BasePresenter<ChatView>() {
                     if (it.from.equals(from)) {
                         message.user = TestUser(from, "Ironman", "R.drawable.ironman")
 
-                        message.time = SimpleDateFormat.getInstance().format(Date(it.msgTime))
+                        message.time = if (lastIt != null && com.letion.test.util.Date
+                                        .isCloseEnough(it.msgTime, lastIt.msgTime)) null else
+                            com.letion.test.util.Date
+                                    .getTimestampString(Date(it.msgTime))
 
                         message.msgStatus = IMessage.MessageStatus.SEND_SUCCEED
                     } else {
                         message.user = TestUser(conversation.userId, conversation.name, conversation.avatar)
 
-                        message.time = SimpleDateFormat.getInstance().format(Date(it.msgTime))
+                        message.time = if (lastIt != null && com.letion.test.util.Date
+                                        .isCloseEnough(it.msgTime, lastIt.msgTime)) null else
+                            com.letion.test.util.Date
+                                    .getTimestampString(Date(it.msgTime))
 
                         message.msgStatus = IMessage.MessageStatus.RECEIVE_SUCCEED
                     }
@@ -136,9 +149,15 @@ class ChatPresenter : BasePresenter<ChatView>() {
 
                 }
 
-            })
+            }
 
             view?.notifyData(list)
+
+            if (pageIndex == 0) {
+                view?.scrollToPosition(0)
+            }
+
+            pageIndex++
 
         }
     }
@@ -146,7 +165,7 @@ class ChatPresenter : BasePresenter<ChatView>() {
     fun receiverMessage(data: String) {
         val message = TestMessage(data, IMessage.MessageType.RECEIVE_TEXT.ordinal)
         message.user = TestUser("0", "DeadPool", "R.drawable.deadpool")
-        message.time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        message.time = com.letion.test.util.Date.getTimestampString(Date())
         message.msgStatus = IMessage.MessageStatus.RECEIVE_SUCCEED
         view?.notifyData(null, message)
     }
@@ -163,8 +182,7 @@ class ChatPresenter : BasePresenter<ChatView>() {
         }
 
         init {
-            arg = AES.encode("{\"type\":\"subscribe\",\"data\":{\"name\":\"" + arg +
-                    "\"}}")
+            arg = AES.encrypt("{\"type\":\"subscribe\",\"data\":{\"name\":\"$arg\"}}")
         }
 
         override fun toString(): String {

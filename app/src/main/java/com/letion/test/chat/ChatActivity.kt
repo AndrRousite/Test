@@ -1,9 +1,11 @@
 package com.letion.test.chat
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import android.widget.ImageView
+import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.letion.green_dao.inputs.OnMenuItemClickListener
@@ -17,16 +19,17 @@ import java.util.*
 
 class ChatActivity : AppCompatActivity(), ChatView {
 
-    var pageIndex: Int = 0
     var chatPresenter: ChatPresenter? = null
     private var list: MutableList<TestMessage>? = null
     private var msgListAdapter: MsgListAdapter<TestMessage>? = null
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
         chatPresenter = ChatPresenter()
         chatPresenter?.view = this
+        chatPresenter?.sessionId = intent.getLongExtra("id", -1)
         chatPresenter?.onCreate()
 
         airPanelLayout.setup {
@@ -62,9 +65,8 @@ class ChatActivity : AppCompatActivity(), ChatView {
 
         chat_view.msgList.setAdapter(msgListAdapter)
 
-        chat_view.ptrLayout?.setPtrHandler {
-            pageIndex++
-            chatPresenter?.loadNextPage(pageIndex)
+        chat_view.ptrLayout?.setOnRefreshListener {
+            chatPresenter?.loadNextPage()
         }
 
         chat_view.setMenuClickListener(object : OnMenuItemClickListener {
@@ -81,7 +83,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
             }
         })
 
-        chat_view.setOnTouchListener { v, event ->
+        chat_view?.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 if (airPanelLayout.isOpen) {
                     airPanelLayout.closePanel()
@@ -92,7 +94,12 @@ class ChatActivity : AppCompatActivity(), ChatView {
             false
         }
 
-        chatPresenter?.loadNextPage(pageIndex)
+        chat_view?.msgList?.setOnTouchListener { v, event ->
+            chat_view?.msgList?.smoothScrollToPosition(0)
+            false
+        }
+
+        chatPresenter?.loadNextPage()
     }
 
 
@@ -119,9 +126,20 @@ class ChatActivity : AppCompatActivity(), ChatView {
         }
     }
 
-    override fun notifyData(content: List<TestMessage>) {
+    override fun notifyData(content: List<TestMessage>?) {
         runOnUiThread({
-            msgListAdapter?.addToEnd(content)
+            chat_view.ptrLayout?.isRefreshing = false
+            if (content != null && content.isNotEmpty()) {
+                msgListAdapter?.addToEnd(content)
+
+            } else
+                ToastUtils.showShort("更有更多数据了")
+        })
+    }
+
+    override fun scrollToPosition(position: Int) {
+        runOnUiThread({
+            chat_view?.msgList?.smoothScrollToPosition(position)
         })
     }
 }

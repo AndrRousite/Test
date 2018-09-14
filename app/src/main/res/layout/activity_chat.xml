@@ -17,17 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.letion.green_dao.messages.ptr.PullToRefreshLayout
+            <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/pull_to_refresh_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@+id/chat_input"
-                app:PtrCloseDuration="300"
-                app:PtrCloseHeaderDuration="2000"
-                app:PtrKeepHeaderWhenRefresh="true"
-                app:PtrPullToRefresh="true"
-                app:PtrRatioHeightToRefresh="1.2"
-                app:PtrResistance="1.2">
+                android:layout_above="@+id/chat_input">
 
                 <com.letion.green_dao.messages.MessageList
                     android:id="@+id/msg_list"
@@ -50,7 +44,7 @@
                     app:showSenderDisplayName="false" />
 
 
-            </com.letion.green_dao.messages.ptr.PullToRefreshLayout>
+            </android.support.v4.widget.SwipeRefreshLayout>
 
             <com.letion.green_dao.inputs.ChatInputView
                 android:id="@+id/chat_input"

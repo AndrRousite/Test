@@ -44,12 +44,12 @@ class MainPresenter : BasePresenter<MainView>() {
 
             override fun onSocketReadResponse(context: Context?, info: ConnectionInfo?, action: String?, data: OriginalData?) {
                 super.onSocketReadResponse(context, info, action, data)
-                receiverMessage(1, data = AES.decode(data?.bodyBytes.toString()))
+                receiverMessage(1, null)
             }
 
             override fun onSocketWriteResponse(context: Context?, info: ConnectionInfo?, action: String?, data: ISendable?) {
                 super.onSocketWriteResponse(context, info, action, data)
-                receiverMessage(1, data = AES.decode(data.toString()))
+                receiverMessage(1, null)
             }
         }
         SocketManager.addISocketActionListener(listener as SocketActionAdapter)
@@ -63,15 +63,18 @@ class MainPresenter : BasePresenter<MainView>() {
 
     fun addOrUpdateConversation() {
         ThreadUtil.execute({
-            val l  = DaoManager.getInstance().addOrUpdateConversation("0", "DeadPool", "R.drawable.deadpool",
+            val l = DaoManager.getInstance().addOrUpdateConversation("0", "DeadPool", "R.drawable.deadpool",
                     "13207962457")
-            if (l>=0){
+            val l2 = DaoManager.getInstance().addOrUpdateConversation("1", "Ironman", "R" +
+                    ".drawable.ironman",
+                    "15014298677")
+            if (l >= 0) {
                 loadConversation()
             }
         })
     }
 
-    private fun receiverMessage(code: Int, data: String) {
+    private fun receiverMessage(code: Int, data: String?) {
         view?.notifyStatus(code, data)
     }
 

@@ -13,6 +13,7 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import com.letion.green_dao.dao.Conversation
 import com.letion.test.R
+import com.letion.test.SocketManager
 import com.letion.test.chat.ChatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -34,7 +35,15 @@ class MainActivity : AppCompatActivity(), MainView {
         testAdapter = TestAdapter(this, mList)
         listView.adapter = testAdapter
 
-        listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> startActivity(Intent(this@MainActivity, ChatActivity::class.java)) }
+        listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position,
+                                                                         id ->
+            run {
+                SocketManager.sessionId = id
+                val intent = Intent(this@MainActivity, ChatActivity::class.java)
+                intent.putExtra("id", id)
+                startActivity(intent)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -42,7 +51,7 @@ class MainActivity : AppCompatActivity(), MainView {
         mainPresenter?.onDestroy()
     }
 
-    override fun notifyStatus(code: Int, content: String) {
+    override fun notifyStatus(code: Int, content: String?) {
         tvStatus.visibility = if (code == 1 || code == 100) View.GONE else View.VISIBLE
         tvStatus.text = content
 
@@ -94,7 +103,7 @@ class MainActivity : AppCompatActivity(), MainView {
         }
 
         override fun getItemId(position: Int): Long {
-            return position.toLong()
+            return getItem(position).id
         }
 
         override fun getCount(): Int {

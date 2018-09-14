@@ -17,6 +17,7 @@ import com.xuhao.android.libsocket.sdk.client.action.ISocketActionListener
 import com.xuhao.android.libsocket.sdk.client.action.SocketActionAdapter
 import com.xuhao.android.libsocket.sdk.client.connection.IConnectionManager
 import java.lang.Exception
+import java.nio.charset.Charset
 import java.util.*
 
 /**
@@ -28,7 +29,7 @@ import java.util.*
  */
 object SocketManager {
 
-    private val sessionId = 1L
+    var sessionId = 64214439902
     private val from = "1"
     private val to = "0"
 
@@ -64,7 +65,7 @@ object SocketManager {
             override fun onSocketReadResponse(context: Context?, info: ConnectionInfo?, action: String?, data: OriginalData?) {
                 super.onSocketReadResponse(context, info, action, data)
                 //assemble(data = AES.decode(data?.bodyBytes.toString()))
-                assembleRead(data = AES.decode(data?.bodyBytes.toString()))
+                assembleRead(data = AES.decrypt(data?.bodyBytes?.toString(Charset.defaultCharset())))
                 sparseArray.forEach { it.onSocketReadResponse(context, info, action, data) }
             }
 

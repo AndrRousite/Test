@@ -12,6 +12,6 @@ import com.letion.test.bean.TestMessage
  * @date 2018/9/8 0008
  */
 interface MainView : IView {
-    fun notifyStatus(code: Int, content: String)
+    fun notifyStatus(code: Int, content: String?)
     fun notifyConversation(data: List<Conversation>)
 }

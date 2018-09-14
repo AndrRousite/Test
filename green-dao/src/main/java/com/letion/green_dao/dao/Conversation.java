@@ -16,7 +16,8 @@ import org.greenrobot.greendao.annotation.Generated;
  */
 @Entity(nameInDb = "tb_conversation")
 public class Conversation {
-    @Id(autoincrement = true)
+    @Id
+    @Property(nameInDb = "session_id")
     private long id;
 
     @Unique
@@ -50,8 +51,8 @@ public class Conversation {
 
     @Generated(hash = 1165643662)
     public Conversation(long id, @NotNull String userId, @NotNull String name,
-            @NotNull String avatar, @NotNull String phone, @NotNull String vendorId,
-            @NotNull String vendorUserId, @NotNull String vendorUserName) {
+                        @NotNull String avatar, @NotNull String phone, @NotNull String vendorId,
+                        @NotNull String vendorUserId, @NotNull String vendorUserName) {
         this.id = id;
         this.userId = userId;
         this.name = name;
