@@ -57,7 +57,7 @@ class MessageDispathcer(socket: Socket, isHex: Boolean) {
     private inner class Reader : Runnable {
         override fun run() {
             try {
-                while (!socket.isClosed()) {
+                while (!socket.isClosed) {
                     var totalBuf: ByteBuffer?
                     try {
                         val headBuf = ByteBuffer.allocate(4)
@@ -108,12 +108,12 @@ class MessageDispathcer(socket: Socket, isHex: Boolean) {
                                     totalBuf.put(bodyArray)
                                     totalBuf.flip()
                                     if (isHex) {
-                                        Log.bytes("read from:" + socket.getInetAddress().getHostAddress() + " data:", totalBuf.array())
+                                        Log.bytes("read from:" + socket.inetAddress.hostAddress + " data:", totalBuf.array())
                                     } else {
-                                        Log.i("read from:" + socket.getInetAddress().getHostAddress() + " data:"
+                                        Log.i("read from:" + socket.inetAddress.hostAddress + " data:"
                                                 + String(totalBuf.array(), Charset.forName("utf-8")))
                                     }
-                                    MessageQueue.getInstace().offer(MsgBean(socket.getInetAddress().getHostAddress(), null!!, totalBuf.array()))
+                                    MessageQueue.getInstace().offer(MsgBean(socket.inetAddress.hostAddress, null!!, totalBuf.array()))
                                     return
                                 } else {//there are no data left in buffer and some data pieces in channel
                                     remainingBuffer = null
@@ -148,13 +148,12 @@ class MessageDispathcer(socket: Socket, isHex: Boolean) {
                     }
 
                     //                        if (mIsHex) {
-                    Log.bytes("read from:" + socket.getInetAddress().getHostAddress() + " data:", totalBuf
-                            .array())
+                    Log.bytes("read from:" + socket.inetAddress.hostAddress + " data:", totalBuf.array())
                     //                        } else {
                     //                            Log.i("read from:" + mSocket.getInetAddress().getHostAddress() + " data:"
                     //                                    + new String(totalBuf.array(), Charset.forName("utf-8")));
                     //                        }
-                    MessageQueue.getInstace().offer(MsgBean(socket.getInetAddress().getHostAddress(), null!!, totalBuf.array()))
+                    MessageQueue.getInstace().offer(MsgBean(socket.inetAddress.hostAddress, null!!, totalBuf.array()))
                 }
             } catch (e: Exception) {
                 Log.e("read error: " + e.message)
@@ -175,7 +174,7 @@ class MessageDispathcer(socket: Socket, isHex: Boolean) {
     inner class Writer : Runnable {
         override fun run() {
             try {
-                while (!socket.isClosed()) {
+                while (!socket.isClosed) {
                     val msgBean = MessageQueue.getInstace().take()
 
                     if (msgBean != null) {
@@ -184,7 +183,7 @@ class MessageDispathcer(socket: Socket, isHex: Boolean) {
                         while (it.hasNext()) {
                             val key = it.next()
                             try {
-                                val os = outputStreamMap.get(key)
+                                val os = outputStreamMap[key]
                                 os?.write(msgBean.byte)
                                 os?.flush()
                             } catch (e: IOException) {
@@ -205,14 +204,14 @@ class MessageDispathcer(socket: Socket, isHex: Boolean) {
             } catch (e: Exception) {
                 Log.e("write error: " + e.message)
             } finally {
-                outputStreamMap.remove(socket.getInetAddress().getHostAddress())
+                outputStreamMap.remove(socket.inetAddress.hostAddress)
                 try {
-                    Log.e("write error:" + socket.getInetAddress().getHostAddress() + " client is disconnect")
+                    Log.e("write error:" + socket.inetAddress.hostAddress + " client is disconnect")
                     outputStream.close()
                     inputStream.close()
                     socket.close()
                 } catch (e: IOException) {
-                    Log.e(socket.getInetAddress().getHostAddress() + "client is disconnect with exception")
+                    Log.e(socket.inetAddress.hostAddress + "client is disconnect with exception")
                 }
 
                 writeFuture.cancel(true)

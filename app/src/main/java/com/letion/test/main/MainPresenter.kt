@@ -55,19 +55,19 @@ class MainPresenter : BasePresenter<MainView>() {
         SocketManager.addISocketActionListener(listener as SocketActionAdapter)
     }
 
-    fun loadConversation() {
+    private fun loadConversation() {
         ThreadUtil.execute({
-            view?.notifyConversation(DaoManager.getInstance().search())
+            view?.notifyConversation(DaoManager.getInstance().searchConversations())
         })
     }
 
     fun addOrUpdateConversation() {
         ThreadUtil.execute({
-            val l = DaoManager.getInstance().addOrUpdateConversation("0", "DeadPool", "R.drawable.deadpool",
-                    "13207962457")
-            val l2 = DaoManager.getInstance().addOrUpdateConversation("1", "Ironman", "R" +
-                    ".drawable.ironman",
-                    "15014298677")
+            val l = DaoManager.getInstance().addOrUpdateConversation(15014298677, 0, 0,
+                    "{'username':'Ironman'," +
+                            "'avatar':'R.drawable.ironman'}")
+            DaoManager.getInstance().addOrUpdateContact(15014298677.toString(), "Ironman", "R.drawable.ironman", "15014298677")
+
             if (l >= 0) {
                 loadConversation()
             }

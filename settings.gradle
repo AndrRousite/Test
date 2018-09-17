@@ -1,1 +1,1 @@
-include ':app', ':java-server', ':green-dao', ':java-client'
+include ':app', ':java-server', ':green-dao', ':java-client', ':kotlin-server'

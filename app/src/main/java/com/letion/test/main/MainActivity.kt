@@ -1,5 +1,6 @@
 package com.letion.test.main
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,14 +9,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.gson.JsonParseException
 import com.letion.green_dao.dao.Conversation
 import com.letion.test.R
 import com.letion.test.SocketManager
 import com.letion.test.chat.ChatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), MainView {
 
@@ -75,25 +80,51 @@ class MainActivity : AppCompatActivity(), MainView {
             inflater = LayoutInflater.from(context)
         }
 
+        @SuppressLint("SetTextI18n")
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
             val viewHolder: ViewHolder
             val itemView: View?
             if (convertView == null) {
-                itemView = inflater?.inflate(android.R.layout.simple_list_item_2, parent, false)
+                itemView = inflater?.inflate(R.layout.item_conversation, parent, false)
                 viewHolder = ViewHolder()
-                viewHolder.text1 = itemView?.findViewById(android.R.id.text1)
-                viewHolder.text2 = itemView?.findViewById(android.R.id.text2)
+                viewHolder.ivAvatar = itemView?.findViewById(R.id.ivAvatar)
+                viewHolder.tvName = itemView?.findViewById(R.id.tvName)
+                viewHolder.tvContent = itemView?.findViewById(R.id.tvContent)
+                viewHolder.tvCount = itemView?.findViewById(R.id.tvCount)
                 itemView?.tag = viewHolder
             } else {
                 itemView = convertView
                 viewHolder = itemView.tag as ViewHolder
             }
 
-            val data = getItem(position)
+            val item = getItem(position)
+            val data = getItem(position).extras
 
-            viewHolder.text1?.text = data.name
+            var name: String? = null
+            var avatar: String? = null
 
-            viewHolder.text2?.text = data.avatar
+            try {
+                val jsonObject = JSONObject(data)
+                name = jsonObject.getString("username")
+                avatar = jsonObject.getString("avatar")
+            } catch (e: JsonParseException) {
+                e.printStackTrace()
+            }
+
+            if (avatar != null && avatar.contains("R.drawable")) {
+                val resId = resources.getIdentifier(avatar.replace("R.drawable.", ""),
+                        "drawable", packageName)
+
+                viewHolder.ivAvatar?.setImageResource(resId)
+            } else if (avatar != null && viewHolder.ivAvatar != null) {
+                Glide.with(this@MainActivity)
+                        .load(avatar)
+                        .apply(RequestOptions().placeholder(R.drawable.aurora_headicon_default))
+                        .into(viewHolder.ivAvatar!!)
+            }
+
+
+            viewHolder.tvName?.text = name
 
             return itemView
         }
@@ -112,7 +143,9 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     inner class ViewHolder {
-        var text1: TextView? = null
-        var text2: TextView? = null
+        var ivAvatar: ImageView? = null
+        var tvName: TextView? = null
+        var tvContent: TextView? = null
+        var tvCount: TextView? = null
     }
 }

@@ -5,16 +5,16 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.letion.green_dao.dao.Contact;
 import com.letion.green_dao.dao.Conversation;
 import com.letion.green_dao.dao.Message;
+import com.letion.green_dao.gen.ContactDao;
 import com.letion.green_dao.gen.ConversationDao;
 import com.letion.green_dao.gen.DaoMaster;
 import com.letion.green_dao.gen.DaoSession;
 import com.letion.green_dao.gen.MessageDao;
-import com.letion.green_dao.util.RandomUtil;
 
-
-import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.AbstractDao;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,9 +38,10 @@ public class DaoManager {
     }
 
     public void init(Context application) {
-        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(application,
-                "lenve.db", null);
-        DaoMaster daoMaster = new DaoMaster(devOpenHelper.getWritableDb());
+//        DaoMaster.DevOpenHelper devOpenHelper = new DaoMaster.DevOpenHelper(application,
+//                "lenve.db", null);
+        DBUpgradeHelper upgradeHelper = new DBUpgradeHelper(application, "lenve.db", null, getStructureChangeDao());
+        DaoMaster daoMaster = new DaoMaster(upgradeHelper.getWritableDb());
         daoSession = daoMaster.newSession();
     }
 
@@ -51,26 +52,47 @@ public class DaoManager {
         return daoSession;
     }
 
-    public long addOrUpdateConversation(String userId, String userName, String userAvatar, String
-            userPhone) {
-        Conversation conversation = new Conversation();
-        conversation.setId(Long.valueOf(RandomUtil.number11()));
-        conversation.setUserId(userId);
-        conversation.setName(userName);
-        conversation.setAvatar(userAvatar);
-        conversation.setPhone(userPhone);
-        conversation.setVendorId(UUID.randomUUID().toString().substring(0, 11));
-        conversation.setVendorUserId(UUID.randomUUID().toString().substring(0, 11));
-        conversation.setVendorUserName(UUID.randomUUID().toString().substring(0, 11));
-        return getDaoSession().getConversationDao().insertOrReplace(conversation);
+    /**
+     * 数据库结构变化的Dao
+     */
+    private static Class<? extends AbstractDao<?, ?>>[] getStructureChangeDao() {
+        Class<? extends AbstractDao<?, ?>>[] results = new Class[]{
+                ConversationDao.class,
+                ContactDao.class,
+                MessageDao.class
+        };
+        return results;
     }
 
-    public List<Conversation> search() {
+    public List<Conversation> searchConversations() {
         return getDaoSession().getConversationDao().loadAll();
     }
 
-    public Conversation searchConversationById(long sessionId) {
-        return getDaoSession().getConversationDao().loadByRowId(sessionId);
+    public long addOrUpdateConversation(Long sessionId, Integer type, Integer unreadcount, String extras) {
+        Conversation conversation = new Conversation();
+        conversation.setId(sessionId);
+        conversation.setType(type);
+        conversation.setExtras(extras);
+        conversation.setUnReadCount(unreadcount);
+        return getDaoSession().getConversationDao().insertOrReplace(conversation);
+    }
+
+    public long addOrUpdateContact(String userId, String userName, String userAvatar, String userPhone) {
+        Contact contact = new Contact();
+        contact.setUserId(userId);
+        contact.setName(userName);
+        contact.setAvatar(userAvatar);
+        contact.setPhone(userPhone);
+        contact.setVendorId(UUID.randomUUID().toString().substring(0, 11));
+        contact.setVendorUserId(UUID.randomUUID().toString().substring(0, 11));
+        contact.setVendorUserName(UUID.randomUUID().toString().substring(0, 11));
+        return getDaoSession().getContactDao().insertOrReplace(contact);
+    }
+
+
+    public Contact searchContactById(long userId) {
+        return getDaoSession().getContactDao().queryBuilder().where(ContactDao.Properties.UserId.eq(String.valueOf
+                (userId))).unique();
     }
 
     public List<Message> searchMessage(long sessionId, int page, int pageSize) {
@@ -100,7 +122,7 @@ public class DaoManager {
     @NonNull Integer
             msgDirection,
                                 @NonNull Long sessionId, @NonNull
-                                        String from, @NonNull String to, @IntRange(from = 0, to
+                                        String from, @Nullable String to, @IntRange(from = 0, to
             = 9) int msgType,
                                 @IntRange(from = 0, to = 1) int
                                         chatType, @Nullable String content, @Nullable String

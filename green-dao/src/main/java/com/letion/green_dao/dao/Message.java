@@ -33,7 +33,6 @@ public class Message {
     @Property(nameInDb = "from")
     private String from;
 
-    @NotNull
     @Property(nameInDb = "to")
     private String to;
 
@@ -55,9 +54,9 @@ public class Message {
     @Property(nameInDb = "status")
     private int status;
 
-    @Generated(hash = 554817402)
+    @Generated(hash = 1323170568)
     public Message(long id, long msgTime, int msgDirection, long sessionId,
-            @NotNull String from, @NotNull String to, int msgType, int chatType,
+            @NotNull String from, String to, int msgType, int chatType,
             String content, String extras, int isRead, int status) {
         this.id = id;
         this.msgTime = msgTime;

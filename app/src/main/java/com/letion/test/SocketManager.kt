@@ -40,7 +40,7 @@ object SocketManager {
     private val sparseArray: LinkedList<ISocketActionListener> = LinkedList()
 
     fun onCreate() {
-        val info = ConnectionInfo("104.238.184.237", 8080)
+        val info = ConnectionInfo("192.168.3.195", 8080)
         manager = OkSocket.open(info)
 
         listener = object : SocketActionAdapter() {

@@ -11,7 +11,7 @@ import com.letion.test.bean.TestMessage
  * @date 2018/9/13 0013
  */
 interface ChatView : IView {
-    fun notifyTitle(title: String)
+    fun notifyTitle(title: String? = "单聊")
 
     fun notifyData(msgId: String?, content: TestMessage)
     fun scrollToPosition(position: Int)

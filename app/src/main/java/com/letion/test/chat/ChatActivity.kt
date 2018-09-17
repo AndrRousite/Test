@@ -116,7 +116,7 @@ class ChatActivity : AppCompatActivity(), ChatView {
         chatPresenter?.onDestroy()
     }
 
-    override fun notifyTitle(title: String) {
+    override fun notifyTitle(title: String?) {
         setTitle(title)
     }
 
